@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Aggressive Ad, Pop-up & Anti-Adblock Shield
 // @namespace    local.shield.adandpopup
-// @version      2.2.0
-// @description  Strips embedded ads, blocks click-jack pop-ups, defuses anti-adblock modals, and cleans AI search boxes.
+// @version      2.3.0
+// @description  Strips embedded ads, blocks click-jack pop-ups, and defuses anti-adblock modals.
 // @match        *://*/*
 // @run-at       document-start
 // @grant        none
@@ -14,35 +14,9 @@
   if (typeof window === 'undefined') return;
 
   /* =========================================================================
-   * 1. GOOGLE SEARCH CLEANER (udm=14 Web Mode)
-   * ========================================================================= */
-  try {
-    const host = window.location.hostname;
-    const path = window.location.pathname;
-    if (host.includes('google.') && (path === '/search' || path.startsWith('/search'))) {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('q') && !urlParams.has('udm') && !urlParams.has('tbm')) {
-        urlParams.set('udm', '14');
-        window.location.replace(`${window.location.origin}${path}?${urlParams.toString()}`);
-        return;
-      }
-    }
-  } catch (_) {}
-
-  /* =========================================================================
-   * 2. PRE-RENDER CSS SUPPRESSION
+   * 1. PRE-RENDER CSS SUPPRESSION
    * ========================================================================= */
   const BLOCKED_SELECTORS = [
-    'div[data-attrid="wa:/description"]',
-    'div[jsname="N760b"]',
-    '#super-search-ai',
-    'div:has(> [aria-label*="AI Overview" i])',
-    'div:has(> [aria-label*="Resumen de IA" i])',
-    'div:has(> [aria-label*="Resumen creado por IA" i])',
-    '[data-entityname*="AI Overview"]',
-    '.g-blk:has([data-async-context*="ai_overview"])',
-    '#b_copilot', '.b_side_copilot', '.copilot-banner',
-    '[data-testid="duckassist"]',
     '.adsbygoogle', 'ins.adsbygoogle', '[id*="google_ads"]', '[id*="div-gpt-ad"]',
     '[class*="taboola"]', '[id*="taboola"]',
     '[class*="outbrain"]', '[id*="outbrain"]',
@@ -90,7 +64,7 @@
   }
 
   /* =========================================================================
-   * 3. AD-SDK STUBS (Anti-Adblock Evasion)
+   * 2. AD-SDK STUBS (Anti-Adblock Evasion)
    * ========================================================================= */
   const adsenseArray = [];
   adsenseArray.push = function (args) {
@@ -141,7 +115,7 @@
   window.adblocker = false;
 
   /* =========================================================================
-   * 4. NETWORK BAIT SCRIPT DEFUSER
+   * 3. NETWORK BAIT SCRIPT DEFUSER
    * ========================================================================= */
   const AD_NET_REGEX = /(?:googlesyndication\.com\/pagead|doubleclick\.net\/gampad|securepubads|criteo\.net|adnxs\.com|taboola\.com|outbrain\.com)/i;
   const BAIT_JS_REGEX = /(?:ads?\b|adblock|advertisement|prebid)\.js(?:\?|$)/i;
@@ -182,7 +156,7 @@
   };
 
   /* =========================================================================
-   * 5. POP-UP & CLICK-TRAP INTERCEPTOR
+   * 4. POP-UP & CLICK-TRAP INTERCEPTOR
    * ========================================================================= */
   const BLOCKED_REDIRECTS = [
     /\b(affiliate|redirect|track|click|popup|popunder|adserver|banner|traffic)\b/i,
@@ -240,7 +214,7 @@
   }, true);
 
   /* =========================================================================
-   * 6. MODAL REMOVER & MUTATION OBSERVER
+   * 5. MODAL REMOVER & MUTATION OBSERVER
    * ========================================================================= */
   const NAGGING = /disable your adblocker|ad blocker detected|desactiva tu bloqueador|bloqueador de anuncios/i;
 
